@@ -113,7 +113,7 @@ $this->time = microtime(true);
 
 		// then retrieve the users calendars available and cache them, too
 		if(!isset($cache_content['calendarList']) || count(array_diff($this->calendar_names, array_keys($cache_content['calendarList']))) > 0) {
-			$resturl = 'https://www.googleapis.com/calendar/v3/users/me/calendarList?fields=items(id,summary,colorId,backgroundColor)';
+			$resturl = 'https://www.googleapis.com/calendar/v3/users/me/calendarList?fields=items(id,summary,summaryOverride,colorId,backgroundColor)';
 			$content = @file_get_contents($resturl, false, $context);
 			if ($content !== false) {
 				$result = json_decode($content);
@@ -121,6 +121,8 @@ $this->time = microtime(true);
 
 				foreach ($result->items as $entry) {
 					$color = '';
+                                        if(isset($entry->summaryOverride) && $entry->summaryOverride != '')
+						$entry->summary = $entry->summaryOverride;
 					if(isset($entry->backgroundColor) && $entry->backgroundColor != '')
 						$color = $entry->backgroundColor;
 					else if(isset($entry->colorId) && $entry->colorId != '') {
